@@ -4,7 +4,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export const actions = {
-	default: async ({ request }) => {
+	default: async ({ request, cookies }) => {
 		const data = await request.formData();
 
 		const username = data.get('username');
@@ -19,6 +19,12 @@ export const actions = {
 		if (!user || user.password !== password) {
 			return fail(400, { message: 'Username atau password salah' });
 		}
+
+		// ✅ simpan session
+		cookies.set('user', user.id, {
+			path: '/',
+			httpOnly: true
+		});
 
 		throw redirect(303, '/dashboard');
 	}
