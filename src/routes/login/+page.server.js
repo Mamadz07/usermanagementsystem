@@ -10,22 +10,21 @@ export const actions = {
 		const username = data.get('username');
 		const password = data.get('password');
 
-		const user = await db
-			.select()
-			.from(users)
-			.where(eq(users.username, username))
-			.get();
+		const result = await db
+	.select()
+	.from(users)
+	.where(eq(users.username, username));
 
+const user = result[0];
 		if (!user || user.password !== password) {
 			return fail(400, { message: 'Username atau password salah' });
 		}
-
-		// ✅ simpan session
-		cookies.set('user', user.id, {
-			path: '/',
-			httpOnly: true
-		});
-
+cookies.set('user', String(user.id), {
+	path: '/',
+	httpOnly: true,
+	sameSite: 'lax',
+    secure: false
+});
 		throw redirect(303, '/dashboard');
 	}
 };
