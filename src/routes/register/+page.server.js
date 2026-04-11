@@ -1,5 +1,5 @@
-import { db } from '$lib/db';
-import { users } from '$lib/server\db/schema';
+import { db } from '$lib/server/db';
+import { users } from '$lib/server/db/schema.js';
 
 export const actions = {
 	default: async ({ request }) => {
