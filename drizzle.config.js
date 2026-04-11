@@ -1,11 +1,8 @@
-import { defineConfig } from 'drizzle-kit';
-
-if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
-
-export default defineConfig({
+export default {
 	schema: './src/lib/server/db/schema.js',
+	out: './drizzle',
 	dialect: 'sqlite',
-	dbCredentials: { url: process.env.DATABASE_URL },
-	verbose: true,
-	strict: true
-});
+	dbCredentials: {
+		url: 'file:./dev.db'
+	}
+};
