@@ -18,7 +18,7 @@ export const actions = {
 		const formAction = data.get('action');
 		const id = data.get('id');
 
-		// 🔵 CREATE
+		//  CREATE
 		if (formAction === 'create') {
 			const username = data.get('username');
 			const password = data.get('password');
@@ -29,7 +29,7 @@ export const actions = {
 			});
 		}
 
-		// 🟡 UPDATE ALAMAT
+		//  UPDATE ALAMAT
 		if (formAction === 'update') {
 			const alamat = data.get('alamat');
 
@@ -39,14 +39,14 @@ export const actions = {
 				.where(eq(users.id, Number(id)));
 		}
 
-		// 🔴 DELETE
+		//  DELETE
 		if (formAction === 'delete') {
 			await db
 				.delete(users)
 				.where(eq(users.id, Number(id)));
 		}
 
-		// 🟣 UPLOAD FOTO (FIX CLOUDLFARE)
+		//  UPLOAD FOTO 
 		if (formAction === 'uploadFoto') {
 			const file = data.get('foto');
 
@@ -56,7 +56,9 @@ export const actions = {
 
 			// convert ke base64
 			const buffer = await file.arrayBuffer();
-			const base64 = Buffer.from(buffer).toString('base64');
+			const base64 = btoa(
+			String.fromCharCode(...new Uint8Array(buffer))
+			);
 
 			const mimeType = file.type;
 
