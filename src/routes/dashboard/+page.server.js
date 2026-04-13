@@ -1,9 +1,7 @@
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { redirect } from '@sveltejs/kit';
-import fs from 'fs';
-import path from 'path';
+import { redirect, fail } from '@sveltejs/kit';
 
 export async function load() {
 	const allUsers = await db.select().from(users);
@@ -48,26 +46,26 @@ export const actions = {
 				.where(eq(users.id, Number(id)));
 		}
 
-		// 🟣 UPLOAD FOTO
+		// 🟣 UPLOAD FOTO (FIX CLOUDLFARE)
 		if (formAction === 'uploadFoto') {
 			const file = data.get('foto');
 
-			if (file && file.size > 0) {
-				const bytes = await file.arrayBuffer();
-				const buffer = Buffer.from(bytes);
-
-				const fileName = Date.now() + '-' + file.name;
-				const filePath = path.join('static/uploads', fileName);
-
-				fs.writeFileSync(filePath, buffer);
-
-				const fileUrl = '/uploads/' + fileName;
-
-				await db
-					.update(users)
-					.set({ foto: fileUrl })
-					.where(eq(users.id, Number(id)));
+			if (!file || file.size === 0) {
+				return fail(400, { error: 'File tidak ada' });
 			}
+
+			// convert ke base64
+			const buffer = await file.arrayBuffer();
+			const base64 = Buffer.from(buffer).toString('base64');
+
+			const mimeType = file.type;
+
+			const fotoBase64 = `data:${mimeType};base64,${base64}`;
+
+			await db
+				.update(users)
+				.set({ foto: fotoBase64 })
+				.where(eq(users.id, Number(id)));
 		}
 
 		throw redirect(303, '/dashboard');

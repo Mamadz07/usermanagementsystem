@@ -15,28 +15,40 @@
 		<div class="bg-white p-6 rounded-xl shadow">
 			{#if selectedUser}
 				<h2 class="text-xl font-bold mb-4">Detail User</h2>
+<!-- FOTO UPLOAD -->
+<form method="POST" enctype="multipart/form-data" class="text-center">
+	<input type="hidden" name="id" value={selectedUser.id} />
+	<input type="hidden" name="action" value="uploadFoto" />
 
-				<!-- FOTO UPLOAD -->
-				<form method="POST" enctype="multipart/form-data" class="text-center">
-					<input type="hidden" name="id" value={selectedUser.id} />
-					<input type="hidden" name="action" value="uploadFoto" />
+	<!-- LABEL TERHUBUNG KE INPUT -->
+	<label for="fotoInput" class="cursor-pointer flex justify-center mb-4">
+		{#if selectedUser.foto}
+			<img 
+				src={selectedUser.foto} 
+				class="w-20 h-20 rounded-full object-cover border"
+				alt="Foto User"
+			/>
+		{:else}
+			<div class="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
+				📷
+			</div>
+		{/if}
+	</label>
 
-					<label class="cursor-pointer flex justify-center mb-4">
-						{#if selectedUser.foto}
-							<img src={selectedUser.foto} class="w-20 h-20 rounded-full object-cover" />
-						{:else}
-							<div class="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
-								📷
-							</div>
-						{/if}
-					</label>
+	<!-- INPUT DISEMBUNYIKAN -->
+	<input 
+		id="fotoInput"
+		type="file" 
+		name="foto" 
+		accept="image/*"
+		class="hidden"
+		required 
+	/>
 
-					<input type="file" name="foto" class="mb-2" required />
-
-					<button class="bg-purple-500 text-white px-4 py-2 rounded w-full">
-						Upload Foto
-					</button>
-				</form>
+	<button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full transition">
+		Upload Foto
+	</button>
+</form>
 
 				<!-- UPDATE -->
 				<form method="POST" class="space-y-3 mt-4">
