@@ -17,11 +17,11 @@ export const actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
 
-		const action = data.get('action');
+		const formAction = data.get('action');
 		const id = data.get('id');
 
 		// 🔵 CREATE
-		if (action === 'create') {
+		if (formAction === 'create') {
 			const username = data.get('username');
 			const password = data.get('password');
 
@@ -32,7 +32,7 @@ export const actions = {
 		}
 
 		// 🟡 UPDATE ALAMAT
-		if (action === 'update') {
+		if (formAction === 'update') {
 			const alamat = data.get('alamat');
 
 			await db
@@ -42,14 +42,14 @@ export const actions = {
 		}
 
 		// 🔴 DELETE
-		if (action === 'delete') {
+		if (formAction === 'delete') {
 			await db
 				.delete(users)
 				.where(eq(users.id, Number(id)));
 		}
 
 		// 🟣 UPLOAD FOTO
-		if (action === 'uploadFoto') {
+		if (formAction === 'uploadFoto') {
 			const file = data.get('foto');
 
 			if (file && file.size > 0) {
