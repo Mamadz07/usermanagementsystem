@@ -1,5 +1,4 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 
 export const actions = {
@@ -10,17 +9,22 @@ export const actions = {
 		const password = data.get('password');
 
 		try {
-			const user = await db.query.users.findFirst({
-				where: (u, { eq }) => eq(u.username, username)
-			});
+			// 🔥 pakai raw query (lebih aman di Cloudflare)
+			const result = await db.run(
+				`SELECT * FROM users WHERE username = ?`,
+				[username]
+			);
+
+			const user = result.rows?.[0];
 
 			if (user && user.password === password) {
 				throw redirect(303, '/dashboard');
 			}
-		} catch (e) {
-			console.log('LOGIN ERROR:', e);
-		}
 
-		return { error: 'Login gagal' };
+			return { error: 'Login gagal' };
+		} catch (err) {
+			console.log('LOGIN ERROR:', err);
+			return { error: 'Server error' };
+		}
 	}
 };

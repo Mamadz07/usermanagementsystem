@@ -1,5 +1,4 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
 import { redirect } from '@sveltejs/kit';
 
 export const actions = {
@@ -10,12 +9,12 @@ export const actions = {
 		const password = data.get('password');
 
 		try {
-			await db.insert(users).values({
-				username,
-				password
-			});
-		} catch (e) {
-			console.log('REGISTER ERROR:', e);
+			await db.run(
+				`INSERT INTO users (username, password) VALUES (?, ?)`,
+				[username, password]
+			);
+		} catch (err) {
+			console.log('REGISTER ERROR:', err);
 		}
 
 		throw redirect(303, '/login');
