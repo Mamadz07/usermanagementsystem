@@ -1,31 +1,36 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/schema';
+import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
 
 export const actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
 
-		const username = data.get('username');
-		const password = data.get('password');
+		const username = data.get('username')?.toString();
+		const password = data.get('password')?.toString();
 
-		try {
-			const result = await db
-				.select()
-				.from(users)
-				.where(eq(users.username, username));
+		// 🔥 DEBUG (penting)
+		console.log('LOGIN INPUT:', username, password);
 
-			const user = result[0];
+		const result = await db
+			.select()
+			.from(users)
+			.where(eq(users.username, username));
 
-			if (user && user.password === password) {
-				throw redirect(303, '/dashboard');
-			}
+		console.log('DB RESULT:', result);
 
-			return { error: 'Username atau password salah' };
-		} catch (err) {
-			console.log('LOGIN ERROR:', err);
-			return { error: 'Server error' };
+		const user = result[0];
+
+		if (!user) {
+			return fail(400, { error: 'User tidak ditemukan' });
 		}
+
+		if (user.password !== password) {
+			return fail(400, { error: 'Password salah' });
+		}
+
+		// ✅ kalau lolos semua
+		throw redirect(303, '/dashboard');
 	}
 };
