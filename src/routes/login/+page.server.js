@@ -1,10 +1,7 @@
 import { db } from '$lib/server/db';
+import { users } from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 import { redirect } from '@sveltejs/kit';
-
-export async function load() {
-	// biar halaman login bisa dibuka tanpa error
-	return {};
-}
 
 export const actions = {
 	default: async ({ request }) => {
@@ -14,12 +11,12 @@ export const actions = {
 		const password = data.get('password');
 
 		try {
-			const result = await db.run(
-				`SELECT * FROM users WHERE username = ?`,
-				[username]
-			);
+			const result = await db
+				.select()
+				.from(users)
+				.where(eq(users.username, username));
 
-			const user = result.rows?.[0];
+			const user = result[0];
 
 			if (user && user.password === password) {
 				throw redirect(303, '/dashboard');
