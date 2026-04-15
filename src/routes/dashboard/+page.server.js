@@ -48,28 +48,26 @@ export const actions = {
 
 		//  UPLOAD FOTO 
 		if (formAction === 'uploadFoto') {
-			const file = data.get('foto');
+	const file = data.get('foto');
 
-			if (!file || file.size === 0) {
-				return fail(400, { error: 'File tidak ada' });
-			}
+	if (!file || file.size === 0) {
+		return fail(400, { error: 'File tidak ada' });
+	}
 
-			// convert ke base64
-			const buffer = await file.arrayBuffer();
-			const base64 = btoa(
-			String.fromCharCode(...new Uint8Array(buffer))
-			);
+	const buffer = await file.arrayBuffer();
 
-			const mimeType = file.type;
+	// ✅ FIX DI SINI
+	const base64 = Buffer.from(buffer).toString('base64');
 
-			const fotoBase64 = `data:${mimeType};base64,${base64}`;
+	const mimeType = file.type;
 
-			await db
-				.update(users)
-				.set({ foto: fotoBase64 })
-				.where(eq(users.id, Number(id)));
-		}
+	const fotoBase64 = `data:${mimeType};base64,${base64}`;
 
+	await db
+		.update(users)
+		.set({ foto: fotoBase64 })
+		.where(eq(users.id, Number(id)));
+}
 		throw redirect(303, '/dashboard');
 	}
 };
