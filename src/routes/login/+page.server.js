@@ -1,6 +1,11 @@
 import { db } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 
+export async function load() {
+	// biar halaman login bisa dibuka tanpa error
+	return {};
+}
+
 export const actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
@@ -9,7 +14,6 @@ export const actions = {
 		const password = data.get('password');
 
 		try {
-			// 🔥 pakai raw query (lebih aman di Cloudflare)
 			const result = await db.run(
 				`SELECT * FROM users WHERE username = ?`,
 				[username]
@@ -21,7 +25,7 @@ export const actions = {
 				throw redirect(303, '/dashboard');
 			}
 
-			return { error: 'Login gagal' };
+			return { error: 'Username atau password salah' };
 		} catch (err) {
 			console.log('LOGIN ERROR:', err);
 			return { error: 'Server error' };
