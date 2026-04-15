@@ -46,7 +46,6 @@ export const actions = {
 				.where(eq(users.id, Number(id)));
 		}
 
-		//  UPLOAD FOTO 
 		if (formAction === 'uploadFoto') {
 	const file = data.get('foto');
 
@@ -56,11 +55,17 @@ export const actions = {
 
 	const buffer = await file.arrayBuffer();
 
-	// ✅ FIX DI SINI
-	const base64 = Buffer.from(buffer).toString('base64');
+	let binary = '';
+	const bytes = new Uint8Array(buffer);
+	const len = bytes.byteLength;
+
+	for (let i = 0; i < len; i++) {
+		binary += String.fromCharCode(bytes[i]);
+	}
+
+	const base64 = btoa(binary);
 
 	const mimeType = file.type;
-
 	const fotoBase64 = `data:${mimeType};base64,${base64}`;
 
 	await db
