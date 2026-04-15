@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
+import { users } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
 import { redirect, fail } from '@sveltejs/kit';
 
