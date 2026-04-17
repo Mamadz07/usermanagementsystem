@@ -22,7 +22,7 @@ export const actions = {
 	// LOGOUT
 	logout: async ({ cookies }) => {
 		cookies.delete('session', { path: '/' });
-		throw redirect(303, '/login');
+		throw redirect(303, '/');
 	},
 
 	default: async ({ request }) => {
