@@ -7,11 +7,9 @@
 		selectedUser = user;
 	}
 </script>
-<form method="POST" action="?/logout">
-	<button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
-		Logout
-	</button>
-</form>
+<a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded">
+	Logout
+</a>
 
 <div class="p-6 bg-gray-100 min-h-screen">
 	<div class="grid md:grid-cols-2 gap-6">
