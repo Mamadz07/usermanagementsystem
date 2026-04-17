@@ -1,15 +1,9 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { users } from '$lib/server/schema';
 import { redirect, fail } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
-export async function load() {
-	const allUsers = await db.select().from(users);
-
-	return {
-		users: allUsers
-	};
-}
+//  HANYA 1 LOAD
 export async function load({ cookies }) {
 	const session = cookies.get('session');
 
@@ -23,14 +17,20 @@ export async function load({ cookies }) {
 		users: allUsers
 	};
 }
+
 export const actions = {
+	// LOGOUT
+	logout: async ({ cookies }) => {
+		cookies.delete('session', { path: '/' });
+		throw redirect(303, '/login');
+	},
+
 	default: async ({ request }) => {
 		const data = await request.formData();
 
 		const formAction = data.get('action');
 		const id = data.get('id');
 
-		//  CREATE
 		if (formAction === 'create') {
 			const username = data.get('username');
 			const password = data.get('password');
@@ -41,7 +41,6 @@ export const actions = {
 			});
 		}
 
-		//  UPDATE ALAMAT
 		if (formAction === 'update') {
 			const alamat = data.get('alamat');
 
@@ -51,7 +50,6 @@ export const actions = {
 				.where(eq(users.id, Number(id)));
 		}
 
-		//  DELETE
 		if (formAction === 'delete') {
 			await db
 				.delete(users)
@@ -59,32 +57,32 @@ export const actions = {
 		}
 
 		if (formAction === 'uploadFoto') {
-	const file = data.get('foto');
+			const file = data.get('foto');
 
-	if (!file || file.size === 0) {
-		return fail(400, { error: 'File tidak ada' });
-	}
+			if (!file || file.size === 0) {
+				return fail(400, { error: 'File tidak ada' });
+			}
 
-	const buffer = await file.arrayBuffer();
+			const buffer = await file.arrayBuffer();
 
-	let binary = '';
-	const bytes = new Uint8Array(buffer);
-	const len = bytes.byteLength;
+			let binary = '';
+			const bytes = new Uint8Array(buffer);
 
-	for (let i = 0; i < len; i++) {
-		binary += String.fromCharCode(bytes[i]);
-	}
+			for (let i = 0; i < bytes.length; i++) {
+				binary += String.fromCharCode(bytes[i]);
+			}
 
-	const base64 = btoa(binary);
+			const base64 = btoa(binary);
+			const mimeType = file.type;
 
-	const mimeType = file.type;
-	const fotoBase64 = `data:${mimeType};base64,${base64}`;
+			const fotoBase64 = `data:${mimeType};base64,${base64}`;
 
-	await db
-		.update(users)
-		.set({ foto: fotoBase64 })
-		.where(eq(users.id, Number(id)));
-}
+			await db
+				.update(users)
+				.set({ foto: fotoBase64 })
+				.where(eq(users.id, Number(id)));
+		}
+
 		throw redirect(303, '/dashboard');
 	}
 };
