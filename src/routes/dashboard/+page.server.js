@@ -20,9 +20,10 @@ export async function load({ cookies }) {
 
 export const actions = {
 	// LOGOUT
+	
 	logout: async ({ cookies }) => {
 		cookies.delete('session', { path: '/' });
-		throw redirect(303, '/');
+		throw redirect(303, '/'); // atau '/login'
 	},
 
 	default: async ({ request }) => {
