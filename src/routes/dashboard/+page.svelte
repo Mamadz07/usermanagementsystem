@@ -49,6 +49,15 @@
 		Upload Foto
 	</button>
 </form>
+<form method="POST">
+	<button
+		name="action"
+		value="logout"
+		class="bg-red-500 text-white px-4 py-2 rounded"
+	>
+		Logout
+	</button>
+</form>
 
 				<!-- UPDATE -->
 				<form method="POST" class="space-y-3 mt-4">

@@ -10,7 +10,19 @@ export async function load() {
 		users: allUsers
 	};
 }
+export async function load({ cookies }) {
+	const session = cookies.get('session');
 
+	if (!session) {
+		throw redirect(303, '/login');
+	}
+
+	const allUsers = await db.select().from(users);
+
+	return {
+		users: allUsers
+	};
+}
 export const actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();

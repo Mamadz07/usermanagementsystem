@@ -1,36 +1,31 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schema';
+import { users } from '$lib/server/schema';
 import { eq } from 'drizzle-orm';
-import { redirect, fail } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 
 export const actions = {
-	default: async ({ request }) => {
+	default: async ({ request, cookies }) => {
 		const data = await request.formData();
 
-		const username = data.get('username')?.toString();
-		const password = data.get('password')?.toString();
+		const username = data.get('username');
+		const password = data.get('password');
 
-		// 🔥 DEBUG (penting)
-		console.log('LOGIN INPUT:', username, password);
-
-		const result = await db
+		const user = await db
 			.select()
 			.from(users)
-			.where(eq(users.username, username));
+			.where(eq(users.username, username))
+			.get();
 
-		console.log('DB RESULT:', result);
+		if (user && user.password === password) {
+			// ✅ SET COOKIE LOGIN
+			cookies.set('session', user.id, {
+				path: '/',
+				httpOnly: true
+			});
 
-		const user = result[0];
-
-		if (!user) {
-			return fail(400, { error: 'User tidak ditemukan' });
+			throw redirect(303, '/dashboard');
 		}
 
-		if (user.password !== password) {
-			return fail(400, { error: 'Password salah' });
-		}
-
-		// ✅ kalau lolos semua
-		throw redirect(303, '/dashboard');
+		return { error: 'Username atau password salah' };
 	}
 };
